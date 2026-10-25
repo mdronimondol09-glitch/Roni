@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>Roni Arena</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<style>
+:root{--bg:#0b1020;--card:#151c33;--card2:#1d2646;--txt:#eef1ff;--mut:#8f9ac4;--acc:#ff5a3c;--acc2:#ffb020;--ok:#3ddc84;--bad:#ff5d6c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+.screen{display:none;position:absolute;inset:0;overflow-y:auto;padding:16px;padding-bottom:40px}
+.screen.on{display:block}
+.wrap{max-width:560px;margin:0 auto}
+h1{margin:6px 0 2px;font-size:30px;letter-spacing:1px}
+h1 span{color:var(--acc)}
+h2{margin:0 0 10px;font-size:16px;color:var(--acc2);text-transform:uppercase;letter-spacing:1px}
+.sub{color:var(--mut);margin:0 0 18px;font-size:14px}
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px}
+input,select{width:100%;background:var(--card2);border:1px solid #2b3766;border-radius:10px;padding:12px;margin:5px 0;outline:none}
+input:focus,select:focus{border-color:var(--acc)}
+.btn{background:var(--acc);border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer}
+.btn.alt{background:var(--card2)}
+.btn.ok{background:var(--ok);color:#052}
+.btn.sm{padding:7px 11px;font-size:13px;border-radius:8px}
+.btn:disabled{opacity:.45}
+.btn.full{width:100%;margin-top:6px}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+.row>.fit{flex:0 0 auto}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs button{flex:1;padding:10px;border:0;border-radius:10px;background:var(--card2);cursor:pointer;font-weight:700}
+.tabs button.on{background:var(--acc)}
+.fb{background:#1877f2;margin-top:8px}
+.footer{text-align:center;color:var(--mut);font-size:13px;margin:26px 0 6px;letter-spacing:.4px}
+.err{color:var(--bad);min-height:20px;font-size:14px;margin-top:6px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.coin{background:var(--card2);border-radius:999px;padding:7px 12px;font-weight:700;color:var(--acc2);cursor:pointer;white-space:nowrap}
+.pill{font-size:12px;color:var(--mut)}
+.list>div{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #222c52}
+.list>div:last-child{border-bottom:0}
+.list .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;background:#555;flex:0 0 auto}
+.dot.on{background:var(--ok)}
+.code{font-size:34px;font-weight:800;letter-spacing:6px;text-align:center;color:var(--acc2)}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;color:#000}
+#toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#000c;border:1px solid #333;border-radius:10px;padding:10px 16px;z-index:50;display:none;max-width:90%;text-align:center}
+#invite{position:fixed;left:10px;right:10px;bottom:10px;background:var(--card2);border:1px solid var(--acc);border-radius:12px;padding:12px;z-index:50;display:none}
+.modal{position:fixed;inset:0;background:#000b;z-index:40;display:none;overflow-y:auto;padding:16px}
+.modal.on{display:block}
+.shopgun{display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #222c52}
+.shopgun .info{flex:1}
+.shopgun b{display:block}
+/* game */
+#game{position:absolute;inset:0;display:none;background:#000}
+#game.on{display:block}
+#gl{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#hud{position:absolute;inset:0;pointer-events:none;user-select:none}
+#cross{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px}
+#cross:before,#cross:after{content:"";position:absolute;background:#fff;opacity:.9}
+#cross:before{left:10px;top:0;width:2px;height:22px}
+#cross:after{top:10px;left:0;height:2px;width:22px}
+#hitm{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border:3px solid var(--bad);border-radius:50%;opacity:0;transition:opacity .15s}
+#hp{position:absolute;left:12px;bottom:12px;width:min(40vw,220px)}
+#hp .bar{height:14px;background:#0008;border-radius:7px;overflow:hidden;border:1px solid #fff4}
+#hp .bar i{display:block;height:100%;width:100%;background:var(--ok);transition:width .12s}
+#hp small{font-size:12px;text-shadow:0 1px 2px #000}
+#score{position:absolute;top:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:80vw}
+#score span{background:#000a;border-radius:999px;padding:4px 10px;font-weight:700;font-size:14px;border:2px solid transparent}
+#score span.me{border-color:#fff}
+#feed{position:absolute;right:10px;top:10px;text-align:right;font-size:13px;text-shadow:0 1px 2px #000}
+#feed div{background:#0009;border-radius:6px;padding:3px 8px;margin-bottom:3px}
+#gtop{position:absolute;left:10px;top:10px;pointer-events:auto}
+#center{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;background:#000a;pointer-events:auto;padding:20px;overflow-y:auto}
+#center.on{display:flex}
+#center .box{background:var(--card);border-radius:16px;padding:20px;max-width:440px;width:100%}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+td,th{padding:5px;text-align:left;border-bottom:1px solid #2b3766}
+#touch{display:none}
+body.touch #touch{display:block}
+#joy{position:absolute;left:18px;bottom:60px;width:130px;height:130px;border-radius:50%;background:#fff2;border:2px solid #fff5;pointer-events:auto;touch-action:none}
+#joy i{position:absolute;left:35px;top:35px;width:60px;height:60px;border-radius:50%;background:#fff6}
+#look{position:absolute;right:0;top:0;width:55%;height:100%;pointer-events:auto;touch-action:none}
+#fire{position:absolute;right:26px;bottom:70px;width:92px;height:92px;border-radius:50%;background:#ff5a3ccc;border:3px solid #fff8;pointer-events:auto;touch-action:none;display:flex;align-items:center;justify-content:center;font-weight:800;z-index:3}
+#hp{bottom:14px}
+body.touch #hp{bottom:14px;left:auto;right:14px;width:150px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN / REGISTER -->
+<div id="auth" class="screen on">
+  <div class="wrap">
+    <h1>RONI <span>ARENA</span></h1>
+    <p class="sub">Online 3D shooter &mdash; friend-der sathe khelo (2 theke 10 jon)</p>
+    <div class="card">
+      <div class="tabs"><button id="tabLogin" class="on">Login</button><button id="tabReg">Register</button></div>
+      <input id="aId" placeholder="Email othoba Mobile number" autocomplete="username" inputmode="email">
+      <input id="aName" placeholder="Player name" maxlength="16" style="display:none">
+      <input id="aPw" type="password" placeholder="Password (min 6)" autocomplete="current-password">
+      <div class="err" id="aErr"></div>
+      <button class="btn full" id="aGo">Login</button>
+      <button class="btn full fb" id="aFb">Continue with Facebook</button>
+    </div>
+    <div class="footer">Creative by Roni &copy;2026</div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="screen">
+  <div class="wrap">
+    <div class="top">
+      <div><h1 style="font-size:22px;margin:0">RONI <span>ARENA</span></h1><div class="pill" id="hName"></div></div>
+      <div class="coin" id="hCoin">0 coin</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>Amar ID</h2>
+      <div class="row"><div style="font-size:22px;font-weight:800" id="hId"></div><button class="btn sm alt fit" id="copyLink">Add-link copy</button></div>
+      <div class="pill" style="margin-top:6px">Ei link friend ke pathan, login korle auto request jabe.</div>
+    </div>
+    <div class="card">
+      <h2>Play</h2>
+      <div class="row">
+        <select id="mMode"><option value="solo">Solo (sobai sobar biruddhe)</option><option value="duo">Duo (2 jon-er team)</option><option value="squad">Squad (4 vs 4)</option></select>
+        <select id="mMax" class="fit" style="width:90px"></select>
+      </div>
+      <button class="btn full" id="mCreate">Room banan</button>
+      <div class="row" style="margin-top:8px"><input id="mCode" placeholder="Room code" maxlength="5" style="text-transform:uppercase"><button class="btn alt fit" id="mJoin">Join</button></div>
+    </div>
+    <div class="card">
+      <h2>Friends</h2>
+      <div class="row"><input id="fId" placeholder="Friend-er ID" inputmode="numeric"><button class="btn alt fit" id="fAdd">Add</button></div>
+      <div id="reqs" class="list"></div>
+      <div id="fList" class="list"></div>
+    </div>
+    <button class="btn full" id="shopBtn">Shop &amp; Topup</button>
+    <button class="btn full alt" id="logout">Logout</button>
+    <div class="footer">Creative by Roni &copy;2026</div>
+  </div>
+</div>
+
+<!-- LOBBY -->
+<div id="lobby" class="screen">
+  <div class="wrap">
+    <div class="top"><h1 style="font-size:22px;margin:0">Lobby</h1><div class="coin" id="lCoin">0 coin</div></div>
+    <div class="card" style="margin-top:12px">
+      <div class="pill" style="text-align:center">Room code</div>
+      <div class="code" id="lCode"></div>
+      <div class="pill" style="text-align:center" id="lInfo"></div>
+      <div class="row" id="lCfg" style="margin-top:8px">
+        <select id="lMode"><option value="solo">Solo</option><option value="duo">Duo</option><option value="squad">Squad 4v4</option></select>
+        <select id="lMax" class="fit" style="width:90px"></select>
+      </div>
+    </div>
+    <div class="card"><h2>Players</h2><div id="lPlayers" class="list"></div></div>
+    <div class="card"><h2>Friend invite</h2><div id="lFriends" class="list"></div></div>
+    <button class="btn full ok" id="lStart">Start match</button>
+    <button class="btn full alt" id="lLeave">Room chharo</button>
+    <div class="err" id="lErr"></div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game">
+  <canvas id="gl"></canvas>
+  <div id="hud">
+    <div id="cross"></div><div id="hitm"></div>
+    <div id="score"></div>
+    <div id="feed"></div>
+    <div id="hp"><small id="hpTxt">HP 100</small><div class="bar"><i id="hpBar"></i></div></div>
+    <div id="gtop"><button class="btn sm alt" id="gLeave">Leave</button></div>
+    <div id="touch"><div id="joy"><i></i></div><div id="look"></div><div id="fire">FIRE</div></div>
+    <div id="center"><div class="box" id="centerBox"></div></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="invite"><div id="invTxt" style="margin-bottom:8px"></div><div class="row"><button class="btn ok sm" id="invYes">Join</button><button class="btn alt sm" id="invNo">Na</button></div></div>
+
+<!-- SHOP -->
+<div id="shop" class="modal">
+  <div class="wrap">
+    <div class="top"><h2 style="margin:0">Shop</h2><div class="coin" id="sCoin">0 coin</div></div>
+    <div class="card" style="margin-top:10px"><h2>Gun</h2><div id="sGuns"></div></div>
+    <div class="card"><h2>Coin topup</h2><div class="pill" id="sTopNote" style="margin-bottom:6px"></div><div id="sPacks"></div></div>
+    <button class="btn full alt" id="sClose">Bondho</button>
+  </div>
+</div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<script type="module" src="/game.js"></script>
+</body>
+</html>
