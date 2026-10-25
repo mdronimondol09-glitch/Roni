@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: roni-arena
+    runtime: node
+    plan: free
+    buildCommand: echo "no build needed"
+    startCommand: node server.js
+    envVars:
+      - key: TOPUP_TEST
+        value: "1"
